@@ -4,10 +4,16 @@ import 'package:go_router/go_router.dart';
 class ScaffoldWithNavBar extends StatelessWidget {
   final Widget child;
 
-  const ScaffoldWithNavBar({
-    super.key,
-    required this.child,
-  });
+  const ScaffoldWithNavBar({super.key, required this.child});
+
+  // Função para obter o título da página com base na rota
+  String _getPageTitle(BuildContext context) {
+    final String location = GoRouterState.of(context).uri.toString();
+    if (location.startsWith('/favorites')) {
+      return 'Favoritos';
+    }
+    return 'App Cátalogo de Filmes';
+  }
 
   // Função para obter o índice atual com base na rota
   int _calculateSelectedIndex(BuildContext context) {
@@ -27,27 +33,24 @@ class ScaffoldWithNavBar extends StatelessWidget {
       case 1:
         context.go('/favorites');
         break;
-      
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(title: Text(_getPageTitle(context)), centerTitle: true),
       body: child, // exibe a tela atual aqui
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _calculateSelectedIndex(context),
         onTap: (index) => _onItemTapped(index, context),
         items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home'
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(
             icon: Icon(Icons.favorite),
             label: 'Favoritos',
-          )
-        ]
+          ),
+        ],
       ),
     );
   }

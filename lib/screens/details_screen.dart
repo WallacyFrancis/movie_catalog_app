@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../api/tmdb_service.dart';
 import '../models/movie.dart';
@@ -17,6 +18,11 @@ class DetailsScreen extends StatefulWidget {
 class _DetailsScreenState extends State<DetailsScreen> {
   late Future<Movie> _movieDetail;
 
+  // Função para voltar para a tela inicial
+  void _goBack(BuildContext context) {
+    context.go('/');
+  }
+
   @override
   void initState() {
     super.initState();
@@ -31,14 +37,19 @@ class _DetailsScreenState extends State<DetailsScreen> {
       builder: (context, favoritesProvider, child) {
         return Scaffold(
           body: FutureBuilder<Movie>(
-            future: _movieDetail, 
+            future: _movieDetail,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());
               }
 
               if (snapshot.hasError) {
-                return Center(child: Text('Erro ao carregar os detalhes: ${snapshot.error}'));
+                return Center(
+                  child: Text(
+                    'Erro ao carregar os detalhes: ${snapshot.error}',
+                    style: const TextStyle(fontSize: 16),
+                  ),
+                );
               }
 
               if (snapshot.hasData) {
@@ -52,9 +63,15 @@ class _DetailsScreenState extends State<DetailsScreen> {
                       expandedHeight: 250.0,
                       pinned: true, // Mantém o AppBar visível ao rolar
                       flexibleSpace: FlexibleSpaceBar(
-                        title: Text(movie.title, style: const TextStyle(fontSize: 16)),
+                        title: Text(
+                          movie.title,
+                          style: const TextStyle(fontSize: 16),
+                          textAlign: TextAlign.center,
+                        ),
                         background: CachedNetworkImage(
-                          imageUrl: TmdbService.getBackdropUrl(movie.backdropPath),
+                          imageUrl: TmdbService.getBackdropUrl(
+                            movie.backdropPath,
+                          ),
                           fit: BoxFit.cover,
                         ),
                       ),
@@ -67,8 +84,8 @@ class _DetailsScreenState extends State<DetailsScreen> {
                           ),
                           onPressed: () {
                             favoritesProvider.toggleFavorite(movie);
-                          }, 
-                        )
+                          },
+                        ),
                       ],
                     ),
 
@@ -85,7 +102,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                 style: const TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
-                                )
+                                ),
                               ),
                               const SizedBox(height: 16),
                               const Text(
@@ -98,22 +115,46 @@ class _DetailsScreenState extends State<DetailsScreen> {
                               const SizedBox(height: 8),
                               Text(
                                 movie.overview,
-                                style: const TextStyle(fontSize: 16, height: 1.5),
-                              )
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  height: 1.5,
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              ElevatedButton(
+                                onPressed: () {
+                                  _goBack(context);
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFF1e3799),
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 24,
+                                    vertical: 12,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                                child: const Text(
+                                  'Voltar',
+                                  style: TextStyle(fontSize: 16),
+                                ),
+                              ),
                             ],
-                          )
+                          ),
                         ),
-                      ])
+                      ]),
                     ),
                   ],
                 );
               }
 
               return const Center(child: Text('Nenhum detalhe encontrado!'));
-            }
+            },
           ),
         );
-      }
+      },
     );
   }
 }
