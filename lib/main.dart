@@ -10,7 +10,8 @@ import './screens/home_screen.dart';
 import './widgets/scaffold_with_nav_bar.dart';
 
 Future<void> main() async {
-  await dotenv.load();
+  WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: ".env");
   runApp(const MyApp());
 }
 
@@ -24,25 +25,22 @@ final _router = GoRouter(
         return ScaffoldWithNavBar(child: child);
       },
       routes: [
-        GoRoute(
-          path: '/',
-          builder: (context, state) => const HomeScreen()
-        ),
+        GoRoute(path: '/', builder: (context, state) => const HomeScreen()),
         GoRoute(
           path: '/favorites',
-          builder: (context, state) => const FavoritesScreen()
-        )
-      ]
+          builder: (context, state) => const FavoritesScreen(),
+        ),
+        GoRoute(
+          path: '/movie/:id',
+          builder: (context, state) {
+            final movieId = state.pathParameters['id']!;
+            return DetailsScreen(movieId: movieId);
+          },
+        ),
+      ],
     ),
     // Rota de Detalhes (fica fora da ShellRoute para aparecer por cima da barra de navegação)
-    GoRoute(
-      path: '/movie/:id',
-      builder: (context, state) {
-        final movieId = state.pathParameters['id']!;
-        return DetailsScreen(movieId: movieId);
-      }
-    )
-  ]
+  ],
 );
 
 class MyApp extends StatelessWidget {
@@ -70,8 +68,7 @@ class MyApp extends StatelessWidget {
           fontFamily: 'Roboto',
         ),
         routerConfig: _router,
-      )
+      ),
     );
   }
 }
-
